@@ -16,5 +16,4 @@
 - maybe don't do fetch on render, but instead use a store combined with a loading phase to avoid unnecessary re-renders
 - from a security standpoint I would encrypt the cached data that is being sent or just use server side rendering to achieve this
 - also sanitize the data that is being embedded in the window.__INITIAL_DATA__ to protect against XSS attacks
-- I would add auth to the page since the content is user sensitive, since it is providing names, mails and balances
-- provide the type interface for the data that is being returned from the API, so that the application can improve type safety
+- I would add auth to the page since the content is user sensitive, since it is providing names, e-mails and balances
