@@ -3,6 +3,8 @@
 // However, you must not change the surface API presented from this file,
 // and you should not need to change any other files in the project to complete the challenge
 
+import { useEffect, useState } from "react";
+
 type UseCachingFetch = (url: string) => {
   isLoading: boolean;
   data: unknown;
@@ -27,14 +29,32 @@ type UseCachingFetch = (url: string) => {
  * 4. This file passes a type-check.
  *
  */
+let cache: Record<string, unknown> = {};
+
 export const useCachingFetch: UseCachingFetch = (url) => {
-  return {
-    data: null,
-    isLoading: false,
-    error: new Error(
-      'UseCachingFetch has not been implemented, please read the instructions in DevTask.md',
-    ),
-  };
+  const [data, setData] = useState<unknown>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (cache[url]) {
+      setData(cache[url]);
+    } else {
+      setIsLoading(true);
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          setData(data);
+          cache[url] = data;
+        })
+        .catch((error) => {
+          setError(new Error(error.message));
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, []);
+
+  return { data, isLoading, error };
 };
 
 /**
@@ -52,9 +72,14 @@ export const useCachingFetch: UseCachingFetch = (url) => {
  *
  */
 export const preloadCachingFetch = async (url: string): Promise<void> => {
-  throw new Error(
-    'preloadCachingFetch has not been implemented, please read the instructions in DevTask.md',
-  );
+  await fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      cache[url] = data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 /**
@@ -73,8 +98,12 @@ export const preloadCachingFetch = async (url: string): Promise<void> => {
  * 4. This file passes a type-check.
  *
  */
-export const serializeCache = (): string => '';
+export const serializeCache = (): string => JSON.stringify(cache);
 
-export const initializeCache = (serializedCache: string): void => {};
+export const initializeCache = (serializedCache: string): void => {
+  cache = JSON.parse(serializedCache);
+};
 
-export const wipeCache = (): void => {};
+export const wipeCache = (): void => {
+  cache = {};
+};
