@@ -33,14 +33,16 @@ let cache: Record<string, unknown> = {};
 
 export const useCachingFetch: UseCachingFetch = (url) => {
   const [data, setData] = useState<unknown>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  
+  // ? init with isLoading true, so that the user sees a loading from the start
 
   useEffect(() => {
     if (cache[url]) {
       setData(cache[url]);
+      setIsLoading(false);
     } else {
-      setIsLoading(true);
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
