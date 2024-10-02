@@ -35,14 +35,16 @@ export const useCachingFetch: UseCachingFetch = (url) => {
   const [data, setData] = useState<unknown>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // ? init with isLoading true, so that the user sees a loading from the start
 
   useEffect(() => {
     if (cache[url]) {
+      // ? cache hit
       setData(cache[url]);
       setIsLoading(false);
     } else {
+      // ? cache miss
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
